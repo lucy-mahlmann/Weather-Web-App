@@ -1,5 +1,24 @@
 WRF Web App
 ============
+name: Lucy Mahlmann
+eid: lam6744
+bitbucketusername: Lmahlmann
+app: https://ec2-3-141-1-150.us-east-2.compute.amazonaws.com:5009
+comments: <Comments, if any>
+
+public DNS of instance: ec2-3-141-1-150.us-east-2.compute.amazonaws.com
+
+6. scp -i “weatherportal-key.pem” assignment5.tar.gz ubuntu@ec2-3-141-1-150.us-east-2.compute.amazonaws.com:~/.
+7. ssh -i “weatherportal-key.pem” ubuntu@ec2-3-141-1-150.us-east-2.compute.amazonaws.com
+• On AWS EC2 VM:
+1. gunzip assignment5.tar.gz
+2. tar –xvf assignment5.tar
+3. cd assignment5
+4. source venv/bin/activate
+5. pip3 install -r requirements.txt
+6. nohup python3 application.py &
+7. exit
+
 
 Run 
 ----

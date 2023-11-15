@@ -117,7 +117,8 @@ class Admin(Base):
     def as_dict(self):
         fields = {}
         for c in self.__table__.columns:
-            fields[c.name] = getattr(self, c.name)
+            if c.name != 'password':
+                fields[c.name] = getattr(self, c.name)
         return fields
 
 
@@ -135,7 +136,8 @@ class User(Base):
     def as_dict(self):
         fields = {}
         for c in self.__table__.columns:
-            fields[c.name] = getattr(self, c.name)
+            if c.name != 'password':
+                fields[c.name] = getattr(self, c.name)
         return fields
 
 
@@ -278,8 +280,9 @@ class ETL():
 etl = ETL()
 
 # Start the ETL process
-p = Process(target=etl.run)
-p.start()
+if __name__ == '__main__':
+    p = Process(target=etl.run)
+    p.start()
 
 
 # https://stackoverflow.com/questions/19473250/how-to-get-user-email-after-oauth-with-google-api-python-client
@@ -325,7 +328,11 @@ def add_admin():
         return Response(status, status=400)
     else:
         # 3. Assignment 5: Use bcrypt to encrypt the password.
-        admin = Admin(name=name, password=password)
+        app.logger.info("password %s", password)
+        
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        app.logger.info("encrypted password %s", hashed)
+        admin = Admin(name=name, password=hashed)
         session.add(admin)
         session.commit()
 
@@ -391,7 +398,8 @@ def add_user():
     password = data['password']
 
     # 4. Assignment 5: Use bcrypt to encrypt the password.
-    newuser = User(name=name, password=password)
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    newuser = User(name=name, password=hashed)
 
     session = DBSession()
     user = session.query(User).filter_by(name=name).first()
@@ -901,7 +909,19 @@ def login():
             # - Check that <username, password> exists in the database
             # - Note that password will be encrypted in the DB.
             # - You will have to use bcrypt's checkpw method to check the password.
-            app.logger.info("TODO: Verify the user and password.")
+            check_user = dbsession.query(User).filter_by(name=username).all()
+            for c in check_user:
+                hashed = password.encode('utf-8')
+                check_password = bcrypt.checkpw(hashed, c.password)
+                if check_password:
+                    app.logger.info("correct password")
+                    #TODO do I need to set the users to c (the user with the same name and password or am i just checking?)
+                    break
+                    #return Response(status=200)
+                else:
+                    app.logger.info("incorrect password")
+                    return render_template('not-found.html',user=username) #TODO is this what I am supposed to do when incorrect password entered
+            
 
     # Load credentials from the session.
     if 'credentials' in flask.session:
@@ -932,7 +952,8 @@ def login():
         user = users.first()
         user_cities = get_user_cities(dbsession, user.id)
     else:
-        user = User(name=username, password=password)
+        user = User(name=username, password=password) #TODO do I need to change this since password is not just password
+        # maybe set User(name=username, password=hashed) - hashed is from earlier in method however need to bring it out of the if statement
         dbsession = DBSession()
         dbsession.add(user)
         dbsession.commit()
