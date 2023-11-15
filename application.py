@@ -806,6 +806,7 @@ def registercity():
 # 5. Assignment 5: 
 # - Connect the "login-using-google" form with this method
 # - For http methods list in the definition, use POST and GET
+@app.route("/authorize", methods=['POST','GET'])
 def authorize():
   if not os.path.exists(CLIENT_SECRETS_FILE):
       return render_template('google-oauth-client-secrets-file-missing.html')
@@ -931,11 +932,15 @@ def login():
         user_email = get_user_info(credentials)['email']
         print("User email:" + user_email)
         username = user_email
-
+        
         # Assignment 5: 
         # - Insert User in the DB
         # - Leave password empty
-
+        dbsession = DBSession()
+        #TODO do i need to check if there already exsists a user with the same email/username??
+        user = User(name=username)
+        dbsession.add(user)
+        dbsession.commit()
         flask.session['credentials'] = credentials_to_dict(credentials)
 
     session['username'] = username
