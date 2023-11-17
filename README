@@ -17,6 +17,7 @@ TODO list
 - revert the \data back to /data before copying to the aws vm
 - update app url before turning in and update uri in google cloud oauth
 -  delete data and -p folders before copying to aws vm
+- delete user3.json
 -  delete this part vv
 6. scp -i “weatherportal-key.pem” assignment5.tar.gz ubuntu@ec2-3-141-1-150.us-east-2.compute.amazonaws.com:~/.
 7. ssh -i “weatherportal-key.pem” ubuntu@ec2-3-141-1-150.us-east-2.compute.amazonaws.com

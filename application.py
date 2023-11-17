@@ -906,7 +906,6 @@ def login():
         password = request.form['password'].strip()
     app.logger.info("Username:%s", username)
     app.logger.info("Password:%s", password)
-    hashed = password.encode('utf-8')
     # 5. Assignment 4 - Check if user is present
     if username != '':
         dbsession = DBSession()
@@ -921,15 +920,11 @@ def login():
             check_user = dbsession.query(User).filter_by(name=username).all()
             found_user = False
             for c in check_user:
-                #TODO this is broken!! 
-                if c.password != None:
-                    check_password = bcrypt.checkpw(hashed, c.password)
-                    if check_password:
-                        app.logger.info("correct password")
-                        #TODO do I need to set the users to c (the user with the same name and password or am i just checking?)
-                        found_user = True
-                        break
-                        #return Response(status=200)
+                if bcrypt.checkpw(password.encode('utf-8'), c.password):
+                    app.logger.info("correct password")
+                    password = c.password
+                    found_user = True
+                    break
             if not found_user: 
                 app.logger.info("incorrect password")
                 return render_template('not-found.html',user=username) #TODO is this what I am supposed to do when incorrect password entered
@@ -956,10 +951,10 @@ def login():
         flask.session['credentials'] = credentials_to_dict(credentials)
 
     session['username'] = username
-    session['password'] = hashed
-
+    session['password'] = password
+   
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username, password=hashed) #TODO name and password
+    users = dbsession.query(User).filter_by(name=username, password=password) #TODO name and password
 
     # 6. Assignment 4 - Return admin_cities
     admin_cities = get_admin_cities(dbsession)
@@ -970,8 +965,7 @@ def login():
         user = users.first()
         user_cities = get_user_cities(dbsession, user.id)
     else:
-        user = User(name=username, password=hashed) #TODO do I need to change this since password is not just password
-        # maybe set User(name=username, password=hashed) - hashed is from earlier in method however need to bring it out of the if statement
+        user = User(name=username, password=password) #TODO do I need to change this since password is not just password
         dbsession = DBSession()
         dbsession.add(user)
         dbsession.commit()
