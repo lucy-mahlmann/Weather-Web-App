@@ -220,8 +220,10 @@ class ETL():
             city_url = city.url
             r = requests.get(city_url)
             # 1. Assignment 4 TODO: Check if the city has data available by checking for return code 404
+            if r.status_code == 404:
+                return
             city_data = r.text
-            data_dir = os.getcwd() + "/data"
+            data_dir = os.getcwd() + "\data" #TODO change to /data before uploading to EC2 instance
             os.system("mkdir -p " + data_dir)
             fp = open(data_dir + "/" + city_name,"w")
             fp.write(city_data)
@@ -402,7 +404,7 @@ def add_user():
     newuser = User(name=name, password=hashed)
 
     session = DBSession()
-    user = session.query(User).filter_by(name=name).first()
+    user = session.query(User).filter_by(name=name, password=hashed).first() #TODO change to query by both password and name
     if user == None:
         session.add(newuser)
         session.commit()
@@ -657,13 +659,16 @@ def city_status_graph():
     app.logger.info("City status:" + city_name)
     
     username = ''
+    password = ''
     if 'username' in session:
         username = session['username']
+    if 'password' in session:
+        password = session['password']
 
     app.logger.info("Username:" + username + " City:" + city_name)    
 
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username)
+    users = dbsession.query(User).filter_by(name=username, password=password) #TODO change to both name and password
     user = users.first()
 
     cities = dbsession.query(City).filter_by(name=city_name)
@@ -736,11 +741,14 @@ def registercity():
     app.logger.info(user_weather_params)
 
     username = ''
+    password = ''
     if 'username' in session:
         username = session['username']
+    if 'password' in session:
+        password = session['password']
 
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username)
+    users = dbsession.query(User).filter_by(name=username, password=password) #TODO change to both name and password, watch lecture 11/13 for info
     cities = None
     try:
         cities = dbsession.query(City).filter_by(name=city_name)
@@ -870,7 +878,7 @@ def oauth2callback():
 @app.route("/logout",methods=['GET'])
 def logout():
     app.logger.info("Logout called.")
-    session.pop('username', None)
+    session.pop('username', None) #TODO should I pop password??
     app.logger.info("Before returning...")
 
     # delete credentials from Flask session
@@ -898,11 +906,11 @@ def login():
         password = request.form['password'].strip()
     app.logger.info("Username:%s", username)
     app.logger.info("Password:%s", password)
-
+    hashed = password.encode('utf-8')
     # 5. Assignment 4 - Check if user is present
     if username != '':
         dbsession = DBSession()
-        users = dbsession.query(User).filter_by(name=username)
+        users = dbsession.query(User).filter_by(name=username) 
         if users.count() == 0:
             return render_template('not-found.html',user=username)
         else:
@@ -911,17 +919,20 @@ def login():
             # - Note that password will be encrypted in the DB.
             # - You will have to use bcrypt's checkpw method to check the password.
             check_user = dbsession.query(User).filter_by(name=username).all()
+            found_user = False
             for c in check_user:
-                hashed = password.encode('utf-8')
-                check_password = bcrypt.checkpw(hashed, c.password)
-                if check_password:
-                    app.logger.info("correct password")
-                    #TODO do I need to set the users to c (the user with the same name and password or am i just checking?)
-                    break
-                    #return Response(status=200)
-                else:
-                    app.logger.info("incorrect password")
-                    return render_template('not-found.html',user=username) #TODO is this what I am supposed to do when incorrect password entered
+                #TODO this is broken!! 
+                if c.password != None:
+                    check_password = bcrypt.checkpw(hashed, c.password)
+                    if check_password:
+                        app.logger.info("correct password")
+                        #TODO do I need to set the users to c (the user with the same name and password or am i just checking?)
+                        found_user = True
+                        break
+                        #return Response(status=200)
+            if not found_user: 
+                app.logger.info("incorrect password")
+                return render_template('not-found.html',user=username) #TODO is this what I am supposed to do when incorrect password entered
             
 
     # Load credentials from the session.
@@ -937,16 +948,18 @@ def login():
         # - Insert User in the DB
         # - Leave password empty
         dbsession = DBSession()
-        #TODO do i need to check if there already exsists a user with the same email/username??
-        user = User(name=username)
-        dbsession.add(user)
-        dbsession.commit()
+        email_user = dbsession.query(User).filter_by(name=username).first()
+        if email_user == None:
+            email_user = User(name=username)
+            dbsession.add(email_user)
+            dbsession.commit()
         flask.session['credentials'] = credentials_to_dict(credentials)
 
     session['username'] = username
+    session['password'] = hashed
 
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username)
+    users = dbsession.query(User).filter_by(name=username, password=hashed) #TODO name and password
 
     # 6. Assignment 4 - Return admin_cities
     admin_cities = get_admin_cities(dbsession)
@@ -957,7 +970,7 @@ def login():
         user = users.first()
         user_cities = get_user_cities(dbsession, user.id)
     else:
-        user = User(name=username, password=password) #TODO do I need to change this since password is not just password
+        user = User(name=username, password=hashed) #TODO do I need to change this since password is not just password
         # maybe set User(name=username, password=hashed) - hashed is from earlier in method however need to bring it out of the if statement
         dbsession = DBSession()
         dbsession.add(user)
