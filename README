@@ -1,31 +1,14 @@
 WRF Web App
 ============
-name: Lucy Mahlmann
-eid: lam6744
-bitbucketusername: Lmahlmann
-app: https://ec2-3-145-150-7.us-east-2.compute.amazonaws.com:5009/
-comments: 
+# name: Lucy Mahlmann
+# eid: lam6744
+# bitbucketusername: Lmahlmann
+# app: https://ec2-3-128-179-175.us-east-2.compute.amazonaws.com:5009/
+# comments: 
 - I added line 285 in order to stop the ETL from erroring
 - after setting up the EC2 instance, I added an admin and two cities: Austin and Dallas
-- added user3.json file which has the same username as user (username = "User1") but a different password (password = "1")
-
-TODO list
-1. shut down aws instance
-2. run the aws instance again
-3. delete the weatherportal.db and .log from the instance
-4. add url to google cloud oauth
-5. add app url to readme
-6. run the application.py
-7. add admin and dallas and austin
-8. check that the users is empty 
-9. make sure repo is right on spreadsheet
-10. delete all these comments and push to bitbucket
-- update app url before turning in and update uri in google cloud oauth
--  delete this part vv
-6. scp -i “weatherportal-key.pem” assignment5.tar.gz ubuntu@ec2-3-145-150-7.us-east-2.compute.amazonaws.com:~/.
-7. ssh -i “weatherportal-key.pem” ubuntu@ec2-3-145-150-7.us-east-2.compute.amazonaws.com
-
-
+- added user3.json file which has the same username as user.json (username = "User1") but a different password (password = "1")
+- I just manually added the /data directory due to the error with the ETL not being able to create one 
 
 Run 
 ----
