@@ -223,7 +223,7 @@ class ETL():
             if r.status_code == 404:
                 return
             city_data = r.text
-            data_dir = os.getcwd() + "\data" #TODO change to /data before uploading to EC2 instance
+            data_dir = os.getcwd() + "/data" 
             os.system("mkdir -p " + data_dir)
             fp = open(data_dir + "/" + city_name,"w")
             fp.write(city_data)
@@ -404,7 +404,7 @@ def add_user():
     newuser = User(name=name, password=hashed)
 
     session = DBSession()
-    user = session.query(User).filter_by(name=name, password=hashed).first() #TODO change to query by both password and name
+    user = session.query(User).filter_by(name=name, password=hashed).first() 
     if user == None:
         session.add(newuser)
         session.commit()
@@ -668,7 +668,7 @@ def city_status_graph():
     app.logger.info("Username:" + username + " City:" + city_name)    
 
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username, password=password) #TODO change to both name and password
+    users = dbsession.query(User).filter_by(name=username, password=password) 
     user = users.first()
 
     cities = dbsession.query(City).filter_by(name=city_name)
@@ -747,8 +747,10 @@ def registercity():
     if 'password' in session:
         password = session['password']
 
+    app.logger.info("password is = %s", password)
+
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username, password=password) #TODO change to both name and password, watch lecture 11/13 for info
+    users = dbsession.query(User).filter_by(name=username, password=password) 
     cities = None
     try:
         cities = dbsession.query(City).filter_by(name=city_name)
@@ -756,6 +758,7 @@ def registercity():
         app.logger.info(e)
     
     user = users.first()
+    app.logger.info("user is %s", user)
     user_cities = get_user_cities(dbsession, user.id)
 
     my_cities = []
@@ -878,7 +881,7 @@ def oauth2callback():
 @app.route("/logout",methods=['GET'])
 def logout():
     app.logger.info("Logout called.")
-    session.pop('username', None) #TODO should I pop password??
+    session.pop('username', None) 
     app.logger.info("Before returning...")
 
     # delete credentials from Flask session
@@ -927,7 +930,7 @@ def login():
                     break
             if not found_user: 
                 app.logger.info("incorrect password")
-                return render_template('not-found.html',user=username) #TODO is this what I am supposed to do when incorrect password entered
+                return render_template('not-found.html',user=username) 
             
 
     # Load credentials from the session.
@@ -945,16 +948,21 @@ def login():
         dbsession = DBSession()
         email_user = dbsession.query(User).filter_by(name=username).first()
         if email_user == None:
-            email_user = User(name=username)
+            email_user = User(name=username, password="")
+            password = ""
             dbsession.add(email_user)
             dbsession.commit()
         flask.session['credentials'] = credentials_to_dict(credentials)
 
     session['username'] = username
     session['password'] = password
+    app.logger.info("setting password to %s", password)
    
     dbsession = DBSession()
-    users = dbsession.query(User).filter_by(name=username, password=password) #TODO name and password
+    # if not password == "":
+    users = dbsession.query(User).filter_by(name=username, password=password) 
+    # else: 
+    #     users = dbsession.query(User).filter_by(name=username) 
 
     # 6. Assignment 4 - Return admin_cities
     admin_cities = get_admin_cities(dbsession)
@@ -965,7 +973,7 @@ def login():
         user = users.first()
         user_cities = get_user_cities(dbsession, user.id)
     else:
-        user = User(name=username, password=password) #TODO do I need to change this since password is not just password
+        user = User(name=username, password=password) 
         dbsession = DBSession()
         dbsession.add(user)
         dbsession.commit()

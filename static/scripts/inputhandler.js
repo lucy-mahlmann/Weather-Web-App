@@ -133,7 +133,7 @@ function get_city_weather_graphs(city) {
 
 	 output_string = "";
 	 statusString = document.getElementById("status_string");
-	 statusString.innerHTML = "Output of " + city.id; //TODO change all the city.id to city.innerHTML and then update the html for cities with spaces
+	 statusString.innerHTML = "Output of " + city.id;
 	 // Clear the previous canvas elements;
 	 outputImg = document.getElementById("outputImg");
 	 outputImg.innerHTML = '';

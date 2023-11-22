@@ -3,32 +3,28 @@ WRF Web App
 name: Lucy Mahlmann
 eid: lam6744
 bitbucketusername: Lmahlmann
-app: https://ec2-3-141-1-150.us-east-2.compute.amazonaws.com:5009/
-comments: - I added line 285 in order to stop the ETL from erroring
-
-public DNS of instance: ec2-3-141-1-150.us-east-2.compute.amazonaws.com
+app: https://ec2-3-145-150-7.us-east-2.compute.amazonaws.com:5009/
+comments: 
+- I added line 285 in order to stop the ETL from erroring
+- after setting up the EC2 instance, I added an admin and two cities: Austin and Dallas
+- added user3.json file which has the same username as user (username = "User1") but a different password (password = "1")
 
 TODO list
-- when deploy aws ec2 add admin and add cities, austin and dallas
-- was i supposed to copy over the austin.json, dallas.json, and houston.json files from assignment4?
-- implement having multiple users with different passwords
-- set up the aws vm 
-- make sure that it is correctly loading the data for the cities
-- revert the \data back to /data before copying to the aws vm
+1. shut down aws instance
+2. run the aws instance again
+3. delete the weatherportal.db and .log from the instance
+4. add url to google cloud oauth
+5. add app url to readme
+6. run the application.py
+7. add admin and dallas and austin
+8. check that the users is empty 
+9. make sure repo is right on spreadsheet
+10. delete all these comments and push to bitbucket
 - update app url before turning in and update uri in google cloud oauth
--  delete data and -p folders before copying to aws vm
-- delete user3.json
 -  delete this part vv
-6. scp -i “weatherportal-key.pem” assignment5.tar.gz ubuntu@ec2-3-141-1-150.us-east-2.compute.amazonaws.com:~/.
-7. ssh -i “weatherportal-key.pem” ubuntu@ec2-3-141-1-150.us-east-2.compute.amazonaws.com
-• On AWS EC2 VM:
-1. gunzip assignment5.tar.gz
-2. tar –xvf assignment5.tar
-3. cd assignment5
-4. source venv/bin/activate
-5. pip3 install -r requirements.txt
-6. nohup python3 application.py &
-7. exit
+6. scp -i “weatherportal-key.pem” assignment5.tar.gz ubuntu@ec2-3-145-150-7.us-east-2.compute.amazonaws.com:~/.
+7. ssh -i “weatherportal-key.pem” ubuntu@ec2-3-145-150-7.us-east-2.compute.amazonaws.com
+
 
 
 Run 
