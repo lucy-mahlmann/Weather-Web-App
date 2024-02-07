@@ -1,19 +1,16 @@
 WRF Web App
 ============
 # name: Lucy Mahlmann
-# eid: lam6744
 # bitbucketusername: Lmahlmann
-# app: https://ec2-3-128-179-175.us-east-2.compute.amazonaws.com:5009/
+# app: https://ec2-3-128-179-175.us-east-2.compute.amazonaws.com:5009/  (no longer available)
 # comments: 
-- I added line 285 in order to stop the ETL from erroring
-- after setting up the EC2 instance, I added an admin and two cities: Austin and Dallas
-- added user3.json file which has the same username as user.json (username = "User1") but a different password (password = "1")
 - I just manually added the /data directory due to the error with the ETL not being able to create one 
+  due to using WindowsOS
 
 Run 
 ----
 1. python3 -m venv venv
-2. source venv/bin/activate
+2. source venv/bin/activate or venv\Scripts\activate for WindowsOS
 3. For Google OAuth:
    - pip3 install --only-binary :all: greenlet
    - pip3 install --only-binary :all: pyopenssl

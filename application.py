@@ -113,7 +113,7 @@ class Admin(Base):
         return "<Admin(name='%s')>" % (self.name)
 
     # Ref: https://stackoverflow.com/questions/5022066/how-to-serialize-sqlalchemy-result-to-json
-    # 1. Assignment 5: Modify the method to not return password in the returned fields
+    # Do not return password field
     def as_dict(self):
         fields = {}
         for c in self.__table__.columns:
@@ -132,7 +132,7 @@ class User(Base):
         return "<User(name='%s')>" % (self.name)
 
     # Ref: https://stackoverflow.com/questions/5022066/how-to-serialize-sqlalchemy-result-to-json
-    # 2. Assignment 5: Modify the method to not return password in the returned fields
+    # Do not return password field
     def as_dict(self):
         fields = {}
         for c in self.__table__.columns:
@@ -219,7 +219,7 @@ class ETL():
             city_name = city.name
             city_url = city.url
             r = requests.get(city_url)
-            # 1. Assignment 4 TODO: Check if the city has data available by checking for return code 404
+            # Check if the city has data available by checking for return code 404
             if r.status_code == 404:
                 return
             city_data = r.text
@@ -329,12 +329,9 @@ def add_admin():
         status = ("Admin with name {name} already exists.\n").format(name=name)
         return Response(status, status=400)
     else:
-        # 3. Assignment 5: Use bcrypt to encrypt the password.
-        app.logger.info("password %s", password)
-        
-        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        app.logger.info("encrypted password %s", hashed)
-        admin = Admin(name=name, password=hashed)
+        # Use bcrypt to encrypt the password.
+        encrypted_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        admin = Admin(name=name, password=encrypted_password)
         session.add(admin)
         session.commit()
 
@@ -399,12 +396,12 @@ def add_user():
     name = data['name']
     password = data['password']
 
-    # 4. Assignment 5: Use bcrypt to encrypt the password.
-    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    newuser = User(name=name, password=hashed)
+    # Use bcrypt to encrypt the password.
+    encrypted_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    newuser = User(name=name, password=encrypted_password)
 
     session = DBSession()
-    user = session.query(User).filter_by(name=name, password=hashed).first() 
+    user = session.query(User).filter_by(name=name, password=encrypted_password).first() 
     if user == None:
         session.add(newuser)
         session.commit()
@@ -480,7 +477,7 @@ def add_city(admin_id):
     else:
         city = City(name=name, url=url, adminId=admin.id)
 
-        # 2. Assignment 4: Check if City with name already exists; Don't add if it already exists
+        # Check if City with name already exists; Don't add if it already exists
         existing_city = session.query(City).filter_by(name=name).first()
         if existing_city != None:
             status = ("City with name {name} already exists.\n").format(name=name)
@@ -648,7 +645,6 @@ def city_status():
     return json.dumps(op)
 
 
-## 3. Assignment 4 
 ## Expected Output:
 ### {'2023-08-TMAX': '411,406,400,406,411,406,411,411,422,417,422,411,411,411,389,400,433,411,400,417,-9999,-9999,-9999', '2023-08-TMIN': '256,261,256,261,256,256,256,256,250,256,261,267,261,250,267,228,250,250,239,256,-9999,-9999,-9999', '2023-08-PRCP': '-9999,-9999,-9999'}
 @app.route("/weather_params", methods=['GET'])
@@ -777,7 +773,7 @@ def registercity():
                 present = True
                 break
 
-    # 4. Assignment 4 - Return admin_cities
+    # Return admin_cities
     admin_cities = get_admin_cities(dbsession)
 
     if present:
@@ -814,7 +810,6 @@ def registercity():
                 status_style="display:block;")
 
 
-# 5. Assignment 5: 
 # - Connect the "login-using-google" form with this method
 # - For http methods list in the definition, use POST and GET
 @app.route("/authorize", methods=['POST','GET'])
@@ -907,19 +902,16 @@ def login():
     if 'username' in request.form:
         username = request.form['username'].strip()
         password = request.form['password'].strip()
-    app.logger.info("Username:%s", username)
-    app.logger.info("Password:%s", password)
-    # 5. Assignment 4 - Check if user is present
+    # Check if user is present
     if username != '':
         dbsession = DBSession()
         users = dbsession.query(User).filter_by(name=username) 
         if users.count() == 0:
             return render_template('not-found.html',user=username)
         else:
-            # 6. Assignment 5:
             # - Check that <username, password> exists in the database
             # - Note that password will be encrypted in the DB.
-            # - You will have to use bcrypt's checkpw method to check the password.
+            # - use bcrypt's checkpw method to check the password.
             check_user = dbsession.query(User).filter_by(name=username).all()
             found_user = False
             for c in check_user:
@@ -941,8 +933,6 @@ def login():
         user_email = get_user_info(credentials)['email']
         print("User email:" + user_email)
         username = user_email
-        
-        # Assignment 5: 
         # - Insert User in the DB
         # - Leave password empty
         dbsession = DBSession()
@@ -964,7 +954,7 @@ def login():
     # else: 
     #     users = dbsession.query(User).filter_by(name=username) 
 
-    # 6. Assignment 4 - Return admin_cities
+    # Return admin_cities
     admin_cities = get_admin_cities(dbsession)
 
     runs = []
