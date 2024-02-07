@@ -156,9 +156,7 @@ app: [https://ec2-3-128-179-175.us-east-2.compute.amazonaws.com:5009/](https://e
 <!-- LEARNING CHALLENGES -->
 ## Learning Challenges
 
-comments: 
-- I just manually added the /data directory due to the error with the ETL not being able to create one 
-  due to using WindowsOS
+- had to manually add the ```/data``` directory due to the error with the ETL not being able to create one because of use of WindowsOS
 
 <!-- CONTACT -->
 ## Contact
