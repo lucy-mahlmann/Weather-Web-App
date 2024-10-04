@@ -7,7 +7,7 @@
     <li><a href="#about-the-application">About The Application</a></li>
     <li><a href="#running-application-locally">Running Application Locally</a></li>
     <li><a href="#frontend">Frontend</a></li>
-    <li><a href="#backend">Backend</a></li>
+    <li><a href="#backend-features">Backend Features</a></li>
     <li><a href="#deployment">Deployment</a></li>
     <li><a href="#learning-challenges">Learning Challenges</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -17,7 +17,7 @@
 <!-- ABOUT THE APPLICATION -->
 ## About The Application
 
-A personal weather portal is a web app that allows users to discover and plot historical values of weather parameters for 
+This personal weather portal is a web app that allows users to discover and plot historical values of weather parameters for 
 different cities in Texas. This web app uses the data made available by the [National Centers for Environmental Information](https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc:C00861/html)
 You can find the data used [here](https://www.ncei.noaa.gov/pub/data/ghcn/daily/) 
 
@@ -62,28 +62,34 @@ Stop
 - Implemented with HTML/CSS and JavaScript
 
 User Login Page
+- Displays an easy to use user login portal that reguires a valid password and username. There is also the option to Login in using an existing Google account.
 
 <img
   src="/static/images/login_screen.png"
   style="display: inline-block; margin: 0 auto; width: auto; height: auto">
   
 Only Allows Users Added by Admin to Login In
+- Users can be added by an admin user who has the privileges to add users. This can be done through the register users REST API.
 
 <img
   src="/static/images/user_not_found.png"
   style="display: inline-block; margin: 0 auto; width: auto; height: auto">
 
-- Forms for users to register cities with specific weather parameters from a certain year and month
-- Implements data checks 
+Once Logged in a User can Interact with the Personal Weather App
+- UI displays forms for users to register cities and the specific weather parameters they want displayed from a certain year and month.
+- Implements data checks to ensure valid inputs:
     * City name should not be empty
     * Month should be a 2 digit number
     * At least one of the weather parameters should be selected
+- Displays on the right hand column the cities that have been added by the admin and there is associated weather data stored in the SQLite database.
+- Once cities have been registered by the user they will appear on the left hand column and can be selected to view their corresponding weather data.
   
 <img
   src="/static/images/input_checks.png"
   style="display: inline-block; margin: 0 auto; width: auto; height: auto">
   
 Selected Registered City Graphs
+- When a registered city is selected, graphs for the specified weather parameters and given year and month will be displayed.
 
 <img
   src="/static/images/Austin_graphs.png"
@@ -92,15 +98,9 @@ Selected Registered City Graphs
 
 
 <!-- BACKEND -->
-## Backend
-Features
-* Encrypted password protection
-* Oauth protocol for users to login via email
-* User and Admin REST APIs for managing registered users and cities
-* ETL process to load weather data into database
-* SQLite database to store weather data for registered Texas cities, added Users, and Admins
-* Error checking
+## Backend Features
 
+Encrypted password protection
 - Used python ```bcrypt``` library to encrypt and decrypt admin and user passwords
     * Only stores the encrypted password in the registered ```User``` table
 ```
@@ -108,14 +108,17 @@ Features
 encrypted_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 newuser = User(name=name, password=encrypted_password)
 ```
+Oauth protocol for users to login via email
 - Implemented Oauth protocol allows users to login with existing identies through Identity Providers (IDP) as part of this web application. Users can register as a user through Google using a preexisting email.
 
+User and Admin REST APIs for managing registered users and cities
 - User and Admin REST APIs include:
   * POST, GET, DELETE for admin users
   * POST, GET, DELETE for non-admin users
   * POST, GET, DELETE for cities registered by admin
   * POST, GET for user cities
 
+ETL process to load weather data into database
 - The web application runs the ETL (Extract, Tansform, and Load) process periodically in the background of the application in order to request the data stored at the [National Centers for Environmental Information](https://www.ncei.noaa.gov/pub/data/ghcn/daily/) website into the ```/data``` directory
 - Transformation of the data is done when the user requests a graph of the city weather parameters in the function defined as ```city_status_graph()```
 ```
@@ -135,7 +138,7 @@ newuser = User(name=name, password=encrypted_password)
     app.logger.info(op)
     return json.dumps(op)
 ```
-
+SQLite database to store weather data for registered Texas cities, added Users, and Admins
 - The web application provides a SQLite database that provides five database tables:
   * ```Admin```: lists all added Admins and cities registered by that admin
   * ```User```: lists all users and their encrypted passwords
@@ -144,7 +147,11 @@ newuser = User(name=name, password=encrypted_password)
   * ```WeatherParameter```: lists all weather data that is extracted from registered cities and their corresponding city id
 - These database tables are interacted with and manipulated by query calls
 
-- Error checks for users not registered, cities not added by the admin, user provides incorrect password 
+Error checking
+- Error checks were implemented for:
+  1. users not registered
+  2. cities not added by the admin
+  3. when user provides incorrect password 
 
 <!-- DEPLOYMENT -->
 ## Deployment
@@ -156,7 +163,8 @@ app: [https://ec2-3-128-179-175.us-east-2.compute.amazonaws.com:5009/](https://e
 <!-- LEARNING CHALLENGES -->
 ## Learning Challenges
 
-- had to manually add the ```/data``` directory due to the error with the ETL not being able to create one because of use of WindowsOS
+- Due to issues caused from the use of WindowOS, I had to manually add the ```/data``` directory due to the error with the ETL not being able to create one using WindowsOS
+- I had never deployed a website using and was unfamiliar with the process. After doing some research I used AWS and followed instructions found in Amazon's documentation and instructions from my professor to properly delploy the web app so it could be publically viewed however due to cost constraints it is no longer available.
 
 <!-- CONTACT -->
 ## Contact
