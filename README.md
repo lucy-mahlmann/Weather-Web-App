@@ -164,7 +164,7 @@ app: [https://ec2-3-128-179-175.us-east-2.compute.amazonaws.com:5009/](https://e
 ## Learning Challenges
 
 - Due to issues caused from the use of WindowOS, I had to manually add the ```/data``` directory due to the error with the ETL not being able to create one using WindowsOS
-- I had never deployed a website using and was unfamiliar with the process. After doing some research I used AWS and followed instructions found in Amazon's documentation and instructions from my professor to properly delploy the web app so it could be publically viewed however due to cost constraints it is no longer available.
+- I had never deployed a website using Amazon Web Services and was unfamiliar with the process. After doing some research I used AWS and followed instructions found in Amazon's documentation and instructions from my professor to properly deploy the web app so it could be publically viewed however due to cost constraints it is no longer available.
 
 <!-- CONTACT -->
 ## Contact
